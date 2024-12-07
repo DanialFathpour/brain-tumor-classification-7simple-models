@@ -8,7 +8,6 @@ import tensorflow as tf
 import os  # To check for file existence
 from tensorflow.keras.models import load_model
 
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -21,6 +20,17 @@ class MainWindow(QMainWindow):
 
         # Main window background color and font---------
         self.setStyleSheet("background-color: #f0f0f0; font-family: Arial;")
+
+        # Logo label---------
+        self.logo_label = QLabel(self)
+        self.logo_label.setGeometry(550, 20, 180, 180)
+        logo_pixmap = QPixmap('logo.png')
+        self.logo_label.setPixmap(logo_pixmap.scaled(self.logo_label.width(), self.logo_label.height(), Qt.KeepAspectRatio))
+
+        # Course title label---------
+        self.course_label = QLabel('Machine Vision course', self)
+        self.course_label.setGeometry(540, 230, 180, 30)
+        self.course_label.setStyleSheet("font-size: 16px; font-weight: bold;")
 
         # Video label-----------
         self.video_label = QLabel(self)
@@ -40,14 +50,19 @@ class MainWindow(QMainWindow):
         self.classify_button.setStyleSheet("background-color: #28a745; color: white; border: none; padding: 5px;")
         self.classify_button.clicked.connect(self.classify_image)
 
-        # Label to display classification result
+        # Labels to display classification result
+        self.confidence_label = QLabel(self)
+        self.confidence_label.setGeometry(490, 420, 250, 30)
+        self.confidence_label.setStyleSheet("background-color: #ffffff; border: 2px solid black; padding: 5px;")
+        self.confidence_label.setAlignment(Qt.AlignCenter)
+
         self.result_label = QLabel(self)
-        self.result_label.setGeometry(490, 480, 250, 60)
+        self.result_label.setGeometry(490, 460, 250, 60)
         self.result_label.setStyleSheet("background-color: #ffffff; border: 2px solid black; padding: 5px;")
         self.result_label.setAlignment(Qt.AlignCenter)
 
         # Load the model
-        self.model = load_model('my_model2_v12.keras')
+        self.model = load_model('my_model2.keras')
         self.classes = ["glioma", "meningioma", "pituitary_tumor"]
 
         # Set up a timer to update the frame regularly
@@ -118,6 +133,7 @@ class MainWindow(QMainWindow):
         prediction = self.model.predict(processed)
         class_index = np.argmax(prediction)
         confidence = prediction[0][class_index]
+        self.confidence_label.setText(f'Confidence: {confidence:.2f}')
         self.result_label.setText(f'Predicted Label: {self.classes[class_index]}')
 
 if __name__ == "__main__":
@@ -126,4 +142,3 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
     sys.exit(app.exec_())
-
